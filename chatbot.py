@@ -1,71 +1,66 @@
-import sys
-import time
+import streamlit as st
 
-def escribir_lento(texto):
-    for letra in texto:
-        sys.stdout.write(letra)
-        sys.stdout.flush()
-        time.sleep(0.01)
-    print()
+# Configuración de la página
+st.set_page_config(page_title="Gluper Box Bot", page_icon="🥗", layout="centered")
 
-def chatbot_gluper():
-    print("=" * 60)
-    print("🤖 ¡Hola! Bienvenido al asistente virtual de GLUPER BOX 🥗📦")
-    print("=" * 60)
-    escribir_lento("Tu solución fácil para comer sano, ahorrar tiempo y lograr tus metas.")
-    
-    nombre = input("\n👉 ¿Cómo te llamas?: ")
-    escribir_lento(f"\n¡Mucho gusto, {nombre}! ✨ ¿En qué te puedo ayudar hoy?")
+st.title("🥗 Asistente Virtual — Gluper Box 📦")
+st.write("¡Hola! Bienvenido al chat de **Gluper**. ¿En qué te podemos ayudar hoy?")
 
-    while True:
-        print("\n" + "-" * 50)
-        print("1️⃣ Ver qué incluye la caja Gluper Box 📦")
-        print("2️⃣ Consultar el menú y suplementos del LUNES 🥑")
-        print("3️⃣ Ver información de precios y ahorro 💸")
-        print("4️⃣ ¿Cómo hacer mi pedido de la semana? 🛒")
-        print("5️⃣ Hablar con un asesor humano 👤")
-        print("6️⃣ Salir 👋")
-        print("-" * 50)
-        
-        opcion = input("Escribe el número de tu opción (1-6): ").strip()
+# Inicializar historial de chat
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {"role": "assistant", "content": "¡Hola! Soy tu asistente de Gluper Box. Selecciona una opción o escribe tu pregunta sobre los menús, suplementos o pedidos."}
+    ]
 
-        if opcion == "1":
-            escribir_lento("\n📦 Nuestra Gluper Box incluye:")
-            escribir_lento("• 3 Comidas completas al día (Desayuno, Almuerzo y Cena) 🥗")
-            escribir_lento("• 1 Postre de media tarde saludable 🍓")
-            escribir_lento("• Bebidas naturales de acompañamiento 🥤")
-            escribir_lento("• Suplementos/Vitaminas de venta libre recomendados 💊")
-            escribir_lento("• Guía nutricional paso a paso para la semana 📋")
+# Mostrar mensajes anteriores
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-        elif opcion == "2":
-            escribir_lento("\n🥑 Menú Ejemplo — LUNES (Arranque de Energía):")
-            escribir_lento("🍳 Desayuno: Omelette de claras con espinacas + Café verde")
-            escribir_lento("🥗 Almuerzo: Pechuga a la plancha con quinoa y vegetales + Té verde")
-            escribir_lento("🌙 Cena: Ensalada de atún con aguacate y ajonjolí + Infusión")
-            escribir_lento("🍓 Postre: Mousse proteico de yogur griego con frutos rojos")
-            escribir_lento("💊 Suplementos: Multivitamínico + Omega 3 (Venta libre)")
+# Opciones rápidas con botones
+st.subheader("💡 Consultas rápidas:")
+col1, col2 = st.columns(2)
 
-        elif opcion == "3":
-            escribir_lento("\n💸 Información de Ahorro:")
-            escribir_lento("Comer fuera o pedir delivery diario te cuesta más dinero y calorías.")
-            escribir_lento("Con Gluper aseguras nutrición completa, ahorras más de 10 horas de cocina a la semana y cero desperdicios.")
+opcion = None
+if col1.button("📦 Ver qué incluye la caja"):
+    opcion = "incluye"
+if col2.button("🥑 Menú y Suplementos Lunes"):
+    opcion = "lunes"
+if col1.button("💸 Precios y Ahorro"):
+    opcion = "precios"
+if col2.button("🛒 ¿Cómo hacer mi pedido?"):
+    opcion = "pedido"
 
-        elif opcion == "4":
-            escribir_lento("\n🛒 ¿Cómo pedir?")
-            escribir_lento("Los pedidos para la semana cierran el VIERNES.")
-            escribir_lento("Puedes coordinar tu envío directo a través de nuestro Instagram @gluper o WhatsApp.")
+# Entrada del usuario por texto
+prompt_usuario = st.chat_input("Escribe tu duda aquí...")
 
-        elif opcion == "5":
-            escribir_lento(f"\n👤 ¡Entendido {nombre}! Un especialista de Gluper te responderá en breve. Déjanos tu número de teléfono.")
-            input("Escribe tu número aquí: ")
-            escribir_lento("✅ ¡Gracias! Te contactaremos hoy mismo.")
+# Lógica del bot
+respuesta_bot = ""
 
-        elif opcion == "6":
-            escribir_lento(f"\n¡Gracias por consultar a Gluper Box, {nombre}! ¡Que tengas un excelente día saludable! 🥗✨")
-            break
+if opcion == "incluye":
+    respuesta_bot = "📦 **La Gluper Box incluye:**\n- 3 Comidas completas al día (Desayuno, Almuerzo, Cena)\n- 1 Postre saludable de media tarde\n- Bebidas naturales\n- Suplementos y vitaminas de venta libre\n- Guía nutricional personalizada 📋"
+elif opcion == "lunes":
+    respuesta_bot = "🥑 **Menú del Lunes:**\n- **Desayuno:** Omelette de claras + Café verde ☕\n- **Almuerzo:** Pechuga a la plancha con quinoa + Té verde 🥗\n- **Cena:** Ensalada de atún con aguacate 🥑\n- **Postre:** Mousse proteico de frutos rojos 🍓\n- **Suplementos:** Multivitamínico + Omega 3 💊"
+elif opcion == "precios":
+    respuesta_bot = "💸 **Beneficio y Ahorro:** Comer fuera a diario cuesta más dinero y calorías. Con Gluper ahorras más de 10 horas a la semana de cocina y aseguras tus metas saludables. ¡Pregunta por nuestras cajas semanales! 💵"
+elif opcion == "pedido":
+    respuesta_bot = "🛒 **¿Cómo pedir?** Cerramos pedidos todos los VIERNES para garantizar ingredientes frescos. Escríbenos a nuestro Instagram @gluper para tomar tus datos de entrega 📲"
+elif prompt_usuario:
+    user_input = prompt_usuario.lower()
+    if "menu" in user_input or "comida" in user_input:
+        respuesta_bot = "Nuestros menús varían cada día e incluyen proteína, carbohidratos complejos, vegetales frescos, bebidas y suplementos. ¿Te gustaría ver el menú del Lunes?"
+    elif "precio" in user_input or "costo" in user_input or "cuanto" in user_input:
+        respuesta_bot = "Nuestras cajas semanales incluyen toda la alimentación de lunes a domingo. Escríbenos por Instagram para consultar las promociones de esta semana. 💳"
+    else:
+        respuesta_bot = "¡Gracias por escribirnos! Un asesor humano de Gluper revisará tu mensaje muy pronto. Si prefieres, escríbenos a WhatsApp o Instagram @gluper. 📩"
 
-        else:
-            escribir_lento("\n⚠️ Opción no válida. Por favor ingresa un número del 1 al 6.")
-
-if __name__ == "__main__":
-    chatbot_gluper()
+# Mostrar respuesta en pantalla
+if respuesta_bot:
+    if prompt_usuario:
+        st.session_state.messages.append({"role": "user", "content": prompt_usuario})
+        with st.chat_message("user"):
+            st.markdown(prompt_usuario)
+            
+    st.session_state.messages.append({"role": "assistant", "content": respuesta_bot})
+    with st.chat_message("assistant"):
+        st.markdown(respuesta_bot)
